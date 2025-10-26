@@ -56,7 +56,8 @@
    npm run dev
 
 
-![TokenFarm Demo Video](sample.mp4)
+<video src="sample.mp4" controls width="600"></video>
+
 
 Notes : 
 
