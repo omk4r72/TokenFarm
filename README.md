@@ -58,7 +58,7 @@
 
 ## 🎥 Project Demo
 
-![Demo](demo.gif)
+![Demo](sample.gif)
 
 
 
