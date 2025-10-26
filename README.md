@@ -41,6 +41,7 @@
 - **Styling:** CSS  
 - **Blockchain Simulation:** Stellar Testnet (Horizon API)  
 - **Wallet Support:** Freighter Wallet & Manual Public Key
+- **Backend : ** Rust
 
 ---
 
