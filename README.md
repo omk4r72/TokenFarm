@@ -1,6 +1,6 @@
 # TokenFarm 🧠
 
-**TokenFarm** is a decentralized yield farming and staking platform built on the Stellar Testnet. It allows users to stake their tokens, earn rewards, and swap between different tokens with a simple and intuitive interface. The platform simulates blockchain interactions and demonstrates DeFi concepts for hackathon purposes.
+**TokenFarm** is a decentralized yield farming and staking platform built on the Stellar Testnet. It allows users to stake their tokens, earn rewards, and swap between different tokens with a simple and intuitive interface.
 
 ---
 
