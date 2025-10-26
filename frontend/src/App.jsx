@@ -19,15 +19,6 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const BASE_RESERVE = 0.5;
 const HORIZON_URL = "https://horizon-testnet.stellar.org";
 
-// Conversion rates: XLM → token
-const TOKEN_RATES = {
-  STELLAR: 1,      // 1 XLM = 1 STELLAR
-  USDC: 0.5,       // 1 XLM = 0.5 USDC
-  BTC: 0.00005,    // 1 XLM = 0.00005 BTC
-  ETH: 0.001,      // 1 XLM = 0.001 ETH
-  SOL: 0.02        // 1 XLM = 0.02 SOL
-};
-
 const App = () => {
   const [walletAddress, setWalletAddress] = useState("");
   const [balances, setBalances] = useState({});
@@ -36,10 +27,10 @@ const App = () => {
   const [manualKey, setManualKey] = useState("");
   const [ledger, setLedger] = useState([]);
   const [amount, setAmount] = useState("");
-  const [selectedToken, setSelectedToken] = useState("");
+  const [selectedToken, setSelectedToken] = useState("STELLAR");
   const [swapAmount, setSwapAmount] = useState("");
-  const [swapFrom, setSwapFrom] = useState("");
-  const [swapTo, setSwapTo] = useState("");
+  const [swapFrom, setSwapFrom] = useState("STELLAR");
+  const [swapTo, setSwapTo] = useState("USDC");
   const [apy, setApy] = useState(null);
   const [rewards, setRewards] = useState([0, 10, 25, 40, 60, 80, 100]);
   const [toasts, setToasts] = useState([]);
@@ -49,10 +40,8 @@ const App = () => {
   const minReserve = (2 + (subentryCount || 0)) * BASE_RESERVE;
   const totalNative = Number(nativeBalance || 0);
   const reservedBalance = Number(minReserve.toFixed(7));
-  const stakedXLM = Object.keys(balances)
-    .filter((k) => k.endsWith("_STAKED"))
-    .reduce((sum, k) => sum + Number(balances[k]), 0);
-  const availableNative = Number(Math.max(0, totalNative - reservedBalance - stakedXLM).toFixed(7));
+  const stakedNative = Number(balances?.STELLAR_STAKED || 0);
+  const availableNative = Number(Math.max(0, totalNative - reservedBalance - stakedNative).toFixed(7));
 
   const showToast = (message, type = "info", ttl = 4500) => {
     const id = Date.now() + Math.random();
@@ -72,20 +61,15 @@ const App = () => {
         if (b.asset_type === "native") native = parseFloat(b.balance);
       });
 
-      parsed["STELLAR"] = 0; // staked balances handled separately
-      parsed["USDC"] = parsed["USDC"] ?? 0;
-      parsed["BTC"] = parsed["BTC"] ?? 0;
-      parsed["ETH"] = parsed["ETH"] ?? 0;
-      parsed["SOL"] = parsed["SOL"] ?? 0;
+      parsed["STELLAR"] = native || 10000;
+      parsed["USDC"] = parsed["USDC"] ?? 5000;
+      parsed["BTC"] = parsed["BTC"] ?? 2;
+      parsed["ETH"] = parsed["ETH"] ?? 10;
+      parsed["SOL"] = parsed["SOL"] ?? 150;
 
       setBalances(parsed);
-      setNativeBalance(native || 10000);
+      setNativeBalance(parsed["STELLAR"]);
       setSubentryCount(data.subentry_count || 0);
-
-      if (!selectedToken) setSelectedToken("STELLAR");
-      if (!swapFrom) setSwapFrom("STELLAR");
-      if (!swapTo) setSwapTo("USDC");
-
       showToast("Account balances loaded", "success");
     } catch (err) {
       showToast("Failed to fetch account info: " + err.message, "error");
@@ -134,29 +118,25 @@ const App = () => {
     setLedger((prev) => [{ action, token, amount, timestamp, txHash }, ...prev]);
   };
 
-  const handleStake = () => {
+  const handleStake = async () => {
     if (!walletAddress) return showToast("Connect wallet first", "error");
     const amt = Number(amount);
-    if (!amt || amt <= 0) return showToast("Enter valid amount", "error");
-
-    const xlmCost = amt / (TOKEN_RATES[selectedToken] || 1);
-    if (xlmCost > availableNative) return showToast("Insufficient available XLM to stake", "error");
+    if (!amt || amt <= 0) return showToast("Enter valid amount to stake", "error");
+    if (amt > availableNative) return showToast("Insufficient available XLM to stake", "error");
 
     const txHash = Math.random().toString(36).substring(2, 10).toUpperCase();
 
     setBalances((prev) => ({
       ...prev,
-      [selectedToken + "_STAKED"]: Number(((prev[selectedToken + "_STAKED"] || 0) + amt).toFixed(7))
+      [selectedToken + "_STAKED"]: Number((Number(prev[selectedToken + "_STAKED"] || 0) + amt).toFixed(7)),
     }));
-    setNativeBalance((prev) => Number((prev - xlmCost).toFixed(7)));
-
     addLedgerEntry("Stake", selectedToken, amt, txHash);
     setAmount("");
-    calculateAPY();
-    showToast(`Staked ${amt} ${selectedToken} (cost ${xlmCost.toFixed(7)} XLM)`, "success");
+    calculateAPY(amt);
+    showToast(`Staked ${amt} ${selectedToken}`, "success");
   };
 
-  const handleSwap = () => {
+  const handleSwap = async () => {
     if (!walletAddress) return showToast("Connect wallet first", "error");
     if (swapFrom === swapTo) return showToast("Cannot swap same token", "error");
 
@@ -164,24 +144,21 @@ const App = () => {
     if (!amt || amt <= 0) return showToast("Enter valid swap amount", "error");
     if ((balances[swapFrom] || 0) < amt) return showToast("Insufficient balance for swap", "error");
 
-    const xlmEquivalent = amt / (TOKEN_RATES[swapFrom] || 1);
-    const received = +(xlmEquivalent * (TOKEN_RATES[swapTo] || 1) * 0.95).toFixed(7);
+    const received = +(amt * 0.95).toFixed(7); // Demo conversion rate
     const txHash = Math.random().toString(36).substring(2, 10).toUpperCase();
 
     setBalances((prev) => ({
       ...prev,
-      [swapFrom]: Number((prev[swapFrom] - amt).toFixed(7)),
-      [swapTo]: Number(((prev[swapTo] || 0) + received).toFixed(7))
+      [swapFrom]: Number((Number(prev[swapFrom] || 0) - amt).toFixed(7)),
+      [swapTo]: Number((Number(prev[swapTo] || 0) + received).toFixed(7)),
     }));
-
     addLedgerEntry("Swap", `${swapFrom} → ${swapTo}`, amt, txHash);
     setSwapAmount("");
     showToast(`Swapped ${amt} ${swapFrom} → ${received} ${swapTo}`, "success");
   };
 
-  const calculateAPY = () => {
+  const calculateAPY = (stakeAmt = 0) => {
     const base = { USDC: 0.05, STELLAR: 0.08, BTC: 0.04, ETH: 0.06, SOL: 0.07 };
-    const stakeAmt = Number(amount || 0);
     if (!stakeAmt) {
       setApy(null);
       return;
@@ -220,8 +197,9 @@ const App = () => {
     <div className="app">
       <BlockchainBackground />
       <div className="container">
-        <h1>TokenFarm </h1>
+        <h1>TokenFarm 🧠</h1>
 
+        {/* Wallet Section */}
         <div className="wallet-section">
           {!walletAddress ? (
             <>
@@ -246,6 +224,7 @@ const App = () => {
           )}
         </div>
 
+        {/* Account Summary */}
         {walletAddress && (
           <>
             <div className="account-summary">
@@ -274,7 +253,7 @@ const App = () => {
                 </div>
                 <div className="stat">
                   <div className="stat-label">Staked</div>
-                  <div className="stat-value">{stakedXLM.toFixed(7)} XLM</div>
+                  <div className="stat-value">{stakedNative} XLM</div>
                 </div>
                 <div className="stat">
                   <div className="stat-label">Available</div>
@@ -283,21 +262,26 @@ const App = () => {
               </div>
             </div>
 
+            {/* Stake Section */}
             <div className="stake-section">
               <select value={selectedToken} onChange={(e) => setSelectedToken(e.target.value)}>
-                {demoTokens.map((t) => <option key={t}>{t}</option>)}
+                {demoTokens.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
               </select>
               <input
                 type="number"
                 placeholder="Amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                onBlur={calculateAPY}
+                onBlur={() => calculateAPY(Number(amount))}
                 max={availableNative}
               />
               <button onClick={handleStake} disabled={amount > availableNative}>Stake</button>
+              {apy && <span className="apy-display">Estimated APY: {apy} {selectedToken}</span>}
             </div>
 
+            {/* Swap Section */}
             <div className="stake-section">
               <select value={swapFrom} onChange={(e) => setSwapFrom(e.target.value)}>
                 {demoTokens.map((t) => (<option key={t}>{t}</option>))}
@@ -316,10 +300,12 @@ const App = () => {
               <button onClick={handleSwap} disabled={swapAmount > (balances[swapFrom] || 0)}>Swap</button>
             </div>
 
+            {/* Rewards Graph */}
             <div className="chart-section">
               <Line data={chartData} options={chartOptions} />
             </div>
 
+            {/* Ledger Section */}
             <div className="ledger-section">
               <h3>Recent Activity</h3>
               <div className="ledger-table">
@@ -360,6 +346,7 @@ const App = () => {
         )}
       </div>
 
+      {/* Toast Notifications */}
       <div className="toast-wrap" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id} className={`toast ${t.type}`}>
