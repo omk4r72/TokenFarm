@@ -56,7 +56,10 @@
    npm run dev
 
 
-<video src="sample.mp4" controls width="600"></video>
+## 🎥 Project Demo
+
+![Demo](demo.gif)
+
 
 
 Notes : 
