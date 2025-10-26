@@ -1,0 +1,69 @@
+/* App.css */
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.token-selection {
+  margin-bottom: 20px;
+}
+
+.stake-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.stake-input {
+  flex: 1;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.stake-btn {
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.staked-dashboard {
+  margin-top: 30px;
+}
+
+.token-bar {
+  margin-bottom: 15px;
+}
+
+.bar-container {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  height: 20px;
+  width: 100%;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.bar-fill {
+  height: 100%;
+  background-color: #4caf50;
+  width: 0;
+  transition: width 0.5s ease;
+}
+
+.rewards-graph {
+  margin-top: 40px;
+  text-align: center;
+  border-top: 1px solid #ccc;
+  padding-top: 20px;
+}

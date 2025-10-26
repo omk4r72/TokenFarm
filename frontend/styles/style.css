@@ -1,0 +1,63 @@
+body {
+    background: #0b0c14; color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex; justify-content: center; align-items: flex-start; padding: 20px; min-height: 100vh;
+}
+.container {
+    background: #1b1d2a; padding: 40px; border-radius: 16px;
+    box-shadow: 0 0 30px rgba(0,255,128,0.4); width: 520px;
+}
+.title {
+    font-size: 2.5rem;
+    background: linear-gradient(90deg,#ff4e50,#f9d423);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.description { margin-bottom: 25px; font-size: 0.9rem; }
+.connect-btn, .stake-btn, .vote-btn, .claim-btn {
+    background: linear-gradient(90deg,#00ff9d,#00c0ff); border: none;
+    padding: 12px 24px; border-radius: 8px; font-size: 1rem; color: #000;
+    cursor: pointer; transition: 0.2s; margin-top: 10px;
+}
+.connect-btn:hover, .stake-btn:hover, .vote-btn:hover, .claim-btn:hover {
+    transform: scale(1.05); box-shadow: 0 0 20px rgba(0,255,128,0.6);
+}
+.wallet-status { margin: 15px 0; font-size: 1.1rem; }
+.wallet-status.connected::before { content: "● "; color: #00ff00; font-weight: bold; }
+.stake-section, .apy-section, .rewards-section, .history-section, .dao-section { margin-top: 20px; }
+.stake-input, #proposalSelect { padding: 10px; border-radius: 6px; border: none; margin-right: 10px; }
+.result { margin-top: 20px; word-wrap: break-word; }
+.rewards-section ul { list-style: none; padding: 0; margin-bottom: 10px; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+table th, table td { border: 1px solid #333; padding: 8px; text-align: center; }
+.vote-results { margin-top: 10px; }
+.progress-bar { background: #00ff9d; height: 12px; border-radius: 6px; width: 0; transition: width 0.5s; }
+
+/* Custom Token Dropdown */
+.custom-select { position: relative; width: 150px; cursor: pointer; background: #2a2c3a; border-radius: 6px; padding: 10px; color: #fff; }
+.custom-select .options { display: none; position: absolute; top: 100%; left: 0; background: #1b1d2a; width: 100%; border-radius: 6px; max-height: 200px; overflow-y: auto; z-index: 10; }
+.custom-select .option { padding: 8px 10px; display: flex; align-items: center; }
+.custom-select .option img { width: 20px; height: 20px; margin-right: 8px; }
+.custom-select .option:hover { background: #00ff9d33; }
+.custom-select.active .options { display: block; }
+
+.dashboard-section {
+  margin-top: 30px;
+  background: #121826;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0,255,180,0.2);
+}
+.dashboard-section table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+  text-align: center;
+}
+.dashboard-section th, .dashboard-section td {
+  padding: 10px;
+  border-bottom: 1px solid #222;
+}
+.dashboard-section img {
+  vertical-align: middle;
+  margin-right: 5px;
+}
