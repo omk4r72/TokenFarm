@@ -4,6 +4,9 @@
 
 ---
 
+![TokenFarm Dashboard](image.png)
+
+
 ## Features
 
 - **Wallet Integration**  
