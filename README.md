@@ -7,6 +7,7 @@
 ![TokenFarm Dashboard](image.png)
 
 
+
 ## Features
 
 - **Wallet Integration**  
@@ -54,6 +55,8 @@
    npm install
    npm run dev
 
+
+![TokenFarm Demo Video](sample.mp4)
 
 Notes : 
 
